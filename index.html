@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Годзи Шпиц</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #cceeff;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+      background: #e0f7fa;
+    }
+    #startScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #cceeff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 10;
+    }
+    #startButton, #pauseButton {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background: #ffcc00;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #pauseButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <div id="startScreen">
+    <h1 style="font-size:2em; margin-bottom:20px;">🎮 Годзи Шпиц</h1>
+    <button id="startButton">Играть</button>
+  </div>
+
+  <button id="pauseButton" style="display: none;">⏸ Пауза</button>
+  <canvas id="gameCanvas"></canvas>
+  <audio id="bgMusic" src="music.mp3" loop></audio>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const spitzHappy = new Image();
+    spitzHappy.src = "images/spitz_happy.png";
+
+    const spitzSad = new Image();
+    spitzSad.src = "images/spitz_sad.png";
+
+    const spitzNeutral = new Image();
+    spitzNeutral.src = "images/spitz.png";
+
+    const treatImg = new Image();
+    treatImg.src = "images/treat.png";
+
+    const coinImg = new Image();
+    coinImg.src = "images/coin.png";
+
+    const spitz = {
+      x: width / 2 - 40,
+      y: height - 100,
+      width: 80,
+      height: 80,
+      mood: "neutral",
+      moodTimeout: null
+    };
+
+    const treats = [];
+    let score = 0;
+    let isPaused = false;
+
+    function drawSpitz() {
+      let image;
+      if (spitz.mood === "happy") image = spitzHappy;
+      else if (spitz.mood === "sad") image = spitzSad;
+      else image = spitzNeutral;
+
+      ctx.drawImage(image, spitz.x, spitz.y, spitz.width, spitz.height);
+    }
+
+    function setMood(mood) {
+      spitz.mood = mood;
+      if (spitz.moodTimeout) clearTimeout(spitz.moodTimeout);
+      spitz.moodTimeout = setTimeout(() => spitz.mood = "neutral", 800);
+    }
+
+    function drawTreats() {
+      for (let i = 0; i < treats.length; i++) {
+        const t = treats[i];
+        t.y += 5;
+        ctx.drawImage(treatImg, t.x - 15, t.y - 15, 30, 30);
+
+        if (
+          t.y + 15 > spitz.y &&
+          t.x > spitz.x &&
+          t.x < spitz.x + spitz.width
+        ) {
+          score++;
+          setMood("happy");
+          treats.splice(i, 1);
+          i--;
+        } else if (t.y > height) {
+          setMood("sad");
+          treats.splice(i, 1);
+          i--;
+        }
+      }
+    }
+
+    function drawScore() {
+      ctx.fillStyle = "black";
+      ctx.font = "24px sans-serif";
+      ctx.fillText("Годзикойны: " + score, 60, 40);
+      ctx.drawImage(coinImg, 20, 12, 30, 30);
+    }
+
+    function update() {
+      if (isPaused) return;
+
+      ctx.clearRect(0, 0, width, height);
+      drawSpitz();
+      drawTreats();
+      drawScore();
+      requestAnimationFrame(update);
+    }
+
+    function dropTreat() {
+      if (!isPaused) {
+        treats.push({ x: Math.random() * (width - 20), y: 0 });
+      }
+    }
+
+    const treatInterval = setInterval(dropTreat, 1200);
+
+    function moveSpitzTo(x) {
+      spitz.x = Math.min(Math.max(x - spitz.width / 2, 0), width - spitz.width);
+    }
+
+    canvas.addEventListener("mousemove", e => moveSpitzTo(e.clientX));
+    canvas.addEventListener("touchmove", e => {
+      e.preventDefault();
+      moveSpitzTo(e.touches[0].clientX);
+    }, { passive: false });
+
+    document.getElementById("startButton").addEventListener("click", () => {
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("pauseButton").style.display = "block";
+      document.getElementById("bgMusic")?.play();
+      update();
+    });
+
+    document.getElementById("pauseButton").addEventListener("click", () => {
+      isPaused = !isPaused;
+      document.getElementById("pauseButton").innerText = isPaused ? "▶ Продолжить" : "⏸ Пауза";
+      if (!isPaused) update();
+    });
+  </script>
+</body>
+</html>
