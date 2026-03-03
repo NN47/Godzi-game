@@ -79,9 +79,19 @@
     const coinImg = new Image();
     coinImg.src = "images/coin.png";
 
+    const stumpImg = new Image();
+    stumpImg.src = "images/stump.png";
+
+    const stump = {
+      x: width / 2 - 55,
+      y: height - 70,
+      width: 110,
+      height: 55
+    };
+
     const spitz = {
-      x: width / 2 - 40,
-      y: height - 100,
+      x: stump.x + (stump.width - 80) / 2,
+      y: stump.y - 65,
       width: 80,
       height: 80,
       mood: "neutral",
@@ -99,6 +109,10 @@
       else image = spitzNeutral;
 
       ctx.drawImage(image, spitz.x, spitz.y, spitz.width, spitz.height);
+    }
+
+    function drawStump() {
+      ctx.drawImage(stumpImg, stump.x, stump.y, stump.width, stump.height);
     }
 
     function setMood(mood) {
@@ -141,6 +155,7 @@
       if (isPaused) return;
 
       ctx.clearRect(0, 0, width, height);
+      drawStump();
       drawSpitz();
       drawTreats();
       drawScore();
@@ -156,7 +171,8 @@
     const treatInterval = setInterval(dropTreat, 1200);
 
     function moveSpitzTo(x) {
-      spitz.x = Math.min(Math.max(x - spitz.width / 2, 0), width - spitz.width);
+      stump.x = Math.min(Math.max(x - stump.width / 2, 0), width - stump.width);
+      spitz.x = stump.x + (stump.width - spitz.width) / 2;
     }
 
     canvas.addEventListener("mousemove", e => moveSpitzTo(e.clientX));
