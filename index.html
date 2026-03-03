@@ -82,6 +82,9 @@
     const stumpImg = new Image();
     stumpImg.src = "images/stump.png";
 
+    const backgroundImg = new Image();
+    backgroundImg.src = "images/background_forest.png";
+
     const stump = {
       x: width / 2 - 55,
       y: height - 70,
@@ -113,6 +116,15 @@
 
     function drawStump() {
       ctx.drawImage(stumpImg, stump.x, stump.y, stump.width, stump.height);
+    }
+
+    function drawBackground() {
+      if (backgroundImg.complete && backgroundImg.naturalWidth > 0) {
+        ctx.drawImage(backgroundImg, 0, 0, width, height);
+      } else {
+        ctx.fillStyle = "#e0f7fa";
+        ctx.fillRect(0, 0, width, height);
+      }
     }
 
     function setMood(mood) {
@@ -155,6 +167,7 @@
       if (isPaused) return;
 
       ctx.clearRect(0, 0, width, height);
+      drawBackground();
       drawStump();
       drawSpitz();
       drawTreats();
