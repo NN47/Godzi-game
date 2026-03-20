@@ -209,7 +209,14 @@
 
     function dropTreat() {
       if (!isPaused && !isGameOver) {
-        treats.push({ x: 15 + Math.random() * (width - 30), y: 0 });
+        const treatSize = 30;
+        const treatRadius = treatSize / 2;
+        const minHorizontalPadding = 40;
+        const spawnPadding = treatRadius + minHorizontalPadding;
+        const safeSpawnWidth = Math.max(width - spawnPadding * 2, 0);
+        const spawnX = spawnPadding + Math.random() * safeSpawnWidth;
+
+        treats.push({ x: spawnX, y: -treatRadius });
       }
     }
 
