@@ -93,7 +93,8 @@
 
     const treats = [];
     let score = 0;
-    let lives = 4;
+    const maxLives = 5;
+    let lives = maxLives;
     let isPaused = false;
     let isGameOver = false;
 
@@ -178,7 +179,10 @@
       ctx.font = "24px sans-serif";
       ctx.fillText("Годзикойны: " + score, 60, 40);
       ctx.drawImage(coinImg, 20, 12, 30, 30);
-      ctx.fillText("Жизни: " + lives, 20, 80);
+      const lifeIcon = "❤️";
+      const lostLifeIcon = "🖤";
+      const livesBar = lifeIcon.repeat(lives) + lostLifeIcon.repeat(maxLives - lives);
+      ctx.fillText("Жизни: " + livesBar, 20, 80);
     }
 
     function drawGameOver() {
