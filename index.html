@@ -79,22 +79,12 @@
     const coinImg = new Image();
     coinImg.src = "images/coin.png";
 
-    const stumpImg = new Image();
-    stumpImg.src = "images/stump.png";
-
     const backgroundImg = new Image();
     backgroundImg.src = "images/background_forest.png";
 
-    const stump = {
-      x: width / 2 - 55,
-      y: height - 70,
-      width: 110,
-      height: 55
-    };
-
     const spitz = {
-      x: stump.x + (stump.width - 80) / 2,
-      y: stump.y - 65,
+      x: width / 2 - 40,
+      y: height - 170,
       width: 80,
       height: 80,
       mood: "neutral",
@@ -103,7 +93,9 @@
 
     const treats = [];
     let score = 0;
+    let lives = 10;
     let isPaused = false;
+    let isGameOver = false;
 
     function drawSpitz() {
       let image;
@@ -112,10 +104,6 @@
       else image = spitzNeutral;
 
       ctx.drawImage(image, spitz.x, spitz.y, spitz.width, spitz.height);
-    }
-
-    function drawStump() {
-      ctx.drawImage(stumpImg, stump.x, stump.y, stump.width, stump.height);
     }
 
     function drawBackground() {
@@ -134,24 +122,43 @@
     }
 
     function drawTreats() {
+      const treatSize = 30;
+      const treatRadius = treatSize / 2;
+
       for (let i = 0; i < treats.length; i++) {
         const t = treats[i];
         t.y += 5;
-        ctx.drawImage(treatImg, t.x - 15, t.y - 15, 30, 30);
+        ctx.drawImage(treatImg, t.x - treatRadius, t.y - treatRadius, treatSize, treatSize);
 
-        if (
-          t.y + 15 > spitz.y &&
-          t.x > spitz.x &&
-          t.x < spitz.x + spitz.width
-        ) {
+        const treatLeft = t.x - treatRadius;
+        const treatRight = t.x + treatRadius;
+        const treatTop = t.y - treatRadius;
+        const treatBottom = t.y + treatRadius;
+        const spitzRight = spitz.x + spitz.width;
+        const spitzBottom = spitz.y + spitz.height;
+        const isCaught =
+          treatRight > spitz.x &&
+          treatLeft < spitzRight &&
+          treatBottom > spitz.y &&
+          treatTop < spitzBottom;
+
+        if (isCaught) {
           score++;
           setMood("happy");
           treats.splice(i, 1);
           i--;
         } else if (t.y > height) {
+          lives--;
           setMood("sad");
           treats.splice(i, 1);
           i--;
+
+          if (lives <= 0) {
+            lives = 0;
+            isGameOver = true;
+            isPaused = true;
+            document.getElementById("pauseButton").innerText = "Игра окончена";
+          }
         }
       }
     }
@@ -161,6 +168,20 @@
       ctx.font = "24px sans-serif";
       ctx.fillText("Годзикойны: " + score, 60, 40);
       ctx.drawImage(coinImg, 20, 12, 30, 30);
+      ctx.fillText("Жизни: " + lives, 20, 80);
+    }
+
+    function drawGameOver() {
+      if (!isGameOver) return;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 42px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Игра окончена", width / 2, height / 2 - 20);
+      ctx.font = "28px sans-serif";
+      ctx.fillText("Счёт: " + score, width / 2, height / 2 + 25);
+      ctx.textAlign = "left";
     }
 
     function update() {
@@ -168,24 +189,23 @@
 
       ctx.clearRect(0, 0, width, height);
       drawBackground();
-      drawStump();
       drawSpitz();
       drawTreats();
       drawScore();
+      drawGameOver();
       requestAnimationFrame(update);
     }
 
     function dropTreat() {
-      if (!isPaused) {
-        treats.push({ x: Math.random() * (width - 20), y: 0 });
+      if (!isPaused && !isGameOver) {
+        treats.push({ x: 15 + Math.random() * (width - 30), y: 0 });
       }
     }
 
     const treatInterval = setInterval(dropTreat, 1200);
 
     function moveSpitzTo(x) {
-      stump.x = Math.min(Math.max(x - stump.width / 2, 0), width - stump.width);
-      spitz.x = stump.x + (stump.width - spitz.width) / 2;
+      spitz.x = Math.min(Math.max(x - spitz.width / 2, 0), width - spitz.width);
     }
 
     canvas.addEventListener("mousemove", e => moveSpitzTo(e.clientX));
@@ -202,6 +222,7 @@
     });
 
     document.getElementById("pauseButton").addEventListener("click", () => {
+      if (isGameOver) return;
       isPaused = !isPaused;
       document.getElementById("pauseButton").innerText = isPaused ? "▶ Продолжить" : "⏸ Пауза";
       if (!isPaused) update();
