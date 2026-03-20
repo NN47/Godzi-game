@@ -1,6 +1,7 @@
 import asyncio
 import os
 import logging
+import time
 from pathlib import Path
 
 from aiohttp import web
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 APP_URL = os.environ["APP_URL"].rstrip("/")  # https://godzi-game.onrender.com
+APP_VERSION = os.getenv("APP_VERSION") or os.getenv("RENDER_GIT_COMMIT") or str(int(time.time()))
 
 PORT = int(os.getenv("PORT", "10000"))
 ROOT = Path(__file__).resolve().parent
@@ -28,7 +30,7 @@ async def start(message: Message) -> None:
         inline_keyboard=[[
             InlineKeyboardButton(
                 text="🎮 Открыть Godzi Game",
-                web_app=WebAppInfo(url=f"{APP_URL}/"),
+                web_app=WebAppInfo(url=f"{APP_URL}/?v={APP_VERSION}"),
             )
         ]]
     )
@@ -36,7 +38,10 @@ async def start(message: Message) -> None:
 
 
 async def index(request: web.Request) -> web.Response:
-    return web.FileResponse(ROOT / "index.html")
+    response = web.FileResponse(ROOT / "index.html")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 
 def create_app() -> web.Application:
