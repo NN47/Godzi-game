@@ -93,6 +93,9 @@
 
     const treats = [];
     let score = 0;
+    const baseTreatFallSpeed = 5;
+    const treatFallSpeedStep = 1;
+    const treatsPerSpeedIncrease = 25;
     const maxLives = 5;
     let lives = maxLives;
     let isPaused = false;
@@ -134,10 +137,12 @@
     function drawTreats() {
       const treatSize = 30;
       const treatRadius = treatSize / 2;
+      const currentTreatFallSpeed =
+        baseTreatFallSpeed + Math.floor(score / treatsPerSpeedIncrease) * treatFallSpeedStep;
 
       for (let i = 0; i < treats.length; i++) {
         const t = treats[i];
-        t.y += 5;
+        t.y += currentTreatFallSpeed;
         if (canDrawImage(treatImg)) {
           ctx.drawImage(treatImg, t.x - treatRadius, t.y - treatRadius, treatSize, treatSize);
         } else {
