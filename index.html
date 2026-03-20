@@ -84,7 +84,7 @@
 
     const spitz = {
       x: width / 2 - 40,
-      y: height - 170,
+      y: height - 230,
       width: 80,
       height: 80,
       mood: "neutral",
@@ -93,7 +93,7 @@
 
     const treats = [];
     let score = 0;
-    let lives = 10;
+    let lives = 4;
     let isPaused = false;
     let isGameOver = false;
 
@@ -113,6 +113,16 @@
         ctx.fillStyle = "#e0f7fa";
         ctx.fillRect(0, 0, width, height);
       }
+    }
+
+    function hideStumpUnderSpitz() {
+      const patchX = spitz.x + spitz.width / 2;
+      const patchY = Math.min(spitz.y + spitz.height + 35, height - 40);
+
+      ctx.fillStyle = "#6eae5d";
+      ctx.beginPath();
+      ctx.ellipse(patchX, patchY, 95, 42, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function setMood(mood) {
@@ -189,6 +199,7 @@
 
       ctx.clearRect(0, 0, width, height);
       drawBackground();
+      hideStumpUnderSpitz();
       drawSpitz();
       drawTreats();
       drawScore();
