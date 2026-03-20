@@ -115,16 +115,6 @@
       }
     }
 
-    function hideStumpUnderSpitz() {
-      const patchX = spitz.x + spitz.width / 2;
-      const patchY = Math.min(spitz.y + spitz.height + 35, height - 40);
-
-      ctx.fillStyle = "#6eae5d";
-      ctx.beginPath();
-      ctx.ellipse(patchX, patchY, 95, 42, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
     function setMood(mood) {
       spitz.mood = mood;
       if (spitz.moodTimeout) clearTimeout(spitz.moodTimeout);
@@ -199,7 +189,6 @@
 
       ctx.clearRect(0, 0, width, height);
       drawBackground();
-      hideStumpUnderSpitz();
       drawSpitz();
       drawTreats();
       drawScore();
