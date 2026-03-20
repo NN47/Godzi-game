@@ -98,17 +98,26 @@
     let isPaused = false;
     let isGameOver = false;
 
+    function canDrawImage(image) {
+      return image.complete && image.naturalWidth > 0;
+    }
+
     function drawSpitz() {
       let image;
       if (spitz.mood === "happy") image = spitzHappy;
       else if (spitz.mood === "sad") image = spitzSad;
       else image = spitzNeutral;
 
-      ctx.drawImage(image, spitz.x, spitz.y, spitz.width, spitz.height);
+      if (canDrawImage(image)) {
+        ctx.drawImage(image, spitz.x, spitz.y, spitz.width, spitz.height);
+      } else {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(spitz.x, spitz.y, spitz.width, spitz.height);
+      }
     }
 
     function drawBackground() {
-      if (backgroundImg.complete && backgroundImg.naturalWidth > 0) {
+      if (canDrawImage(backgroundImg)) {
         ctx.drawImage(backgroundImg, 0, 0, width, height);
       } else {
         ctx.fillStyle = "#e0f7fa";
@@ -129,7 +138,14 @@
       for (let i = 0; i < treats.length; i++) {
         const t = treats[i];
         t.y += 5;
-        ctx.drawImage(treatImg, t.x - treatRadius, t.y - treatRadius, treatSize, treatSize);
+        if (canDrawImage(treatImg)) {
+          ctx.drawImage(treatImg, t.x - treatRadius, t.y - treatRadius, treatSize, treatSize);
+        } else {
+          ctx.beginPath();
+          ctx.fillStyle = "#ffb74d";
+          ctx.arc(t.x, t.y, treatRadius, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
         const treatLeft = t.x - treatRadius;
         const treatRight = t.x + treatRadius;
@@ -168,7 +184,14 @@
       ctx.fillStyle = "black";
       ctx.font = "24px sans-serif";
       ctx.fillText("Годзикойны: " + score, 60, 40);
-      ctx.drawImage(coinImg, 20, 12, 30, 30);
+      if (canDrawImage(coinImg)) {
+        ctx.drawImage(coinImg, 20, 12, 30, 30);
+      } else {
+        ctx.beginPath();
+        ctx.fillStyle = "#ffd54f";
+        ctx.arc(35, 27, 15, 0, Math.PI * 2);
+        ctx.fill();
+      }
       const lifeIcon = "❤️";
       const lostLifeIcon = "🖤";
       const livesBar = lifeIcon.repeat(lives) + lostLifeIcon.repeat(maxLives - lives);
