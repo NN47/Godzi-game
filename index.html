@@ -53,11 +53,15 @@
 
   <button id="pauseButton" style="display: none;">⏸ Пауза</button>
   <canvas id="gameCanvas"></canvas>
-  <audio id="bgMusic" src="music.mp3" loop></audio>
+  <audio id="bgMusic" loop></audio>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const appVersion = queryParams.get("v") || "";
+    const withVersion = (path) => appVersion ? `${path}?v=${encodeURIComponent(appVersion)}` : path;
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -65,22 +69,25 @@
     canvas.height = height;
 
     const spitzHappy = new Image();
-    spitzHappy.src = "images/spitz_happy.png";
+    spitzHappy.src = withVersion("images/spitz_happy.png");
 
     const spitzSad = new Image();
-    spitzSad.src = "images/spitz_sad.png";
+    spitzSad.src = withVersion("images/spitz_sad.png");
 
     const spitzNeutral = new Image();
-    spitzNeutral.src = "images/spitz.png";
+    spitzNeutral.src = withVersion("images/spitz.png");
 
     const treatImg = new Image();
-    treatImg.src = "images/treat.png";
+    treatImg.src = withVersion("images/treat.png");
 
     const coinImg = new Image();
-    coinImg.src = "images/coin.png";
+    coinImg.src = withVersion("images/coin.png");
 
     const backgroundImg = new Image();
-    backgroundImg.src = "images/background_forest.png";
+    backgroundImg.src = withVersion("images/background_forest.png");
+
+    const bgMusic = document.getElementById("bgMusic");
+    bgMusic.src = withVersion("music.mp3");
 
     const spitz = {
       x: width / 2 - 40,
