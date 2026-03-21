@@ -28,7 +28,7 @@
       flex-direction: column;
       z-index: 10;
     }
-    #startButton, #pauseButton {
+    #startButton, #pauseButton, #restartButton {
       padding: 10px 20px;
       font-size: 1.2em;
       background: #ffcc00;
@@ -43,6 +43,14 @@
       right: 10px;
       z-index: 5;
     }
+    #restartButton {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, 70px);
+      z-index: 6;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -52,6 +60,7 @@
   </div>
 
   <button id="pauseButton" style="display: none;">⏸ Пауза</button>
+  <button id="restartButton">Начать заново</button>
   <canvas id="gameCanvas"></canvas>
   <audio id="bgMusic" loop></audio>
 
@@ -101,12 +110,14 @@
     const treats = [];
     let score = 0;
     const baseTreatFallSpeed = 5;
-    const treatFallSpeedStep = 1.25;
+    const treatFallSpeedStep = 1.5;
     const treatsPerSpeedIncrease = 25;
     const maxLives = 5;
     let lives = maxLives;
     let isPaused = false;
     let isGameOver = false;
+    const pauseButton = document.getElementById("pauseButton");
+    const restartButton = document.getElementById("restartButton");
 
     function canDrawImage(image) {
       return image.complete && image.naturalWidth > 0;
@@ -186,7 +197,8 @@
             lives = 0;
             isGameOver = true;
             isPaused = true;
-            document.getElementById("pauseButton").innerText = "Игра окончена";
+            pauseButton.style.display = "none";
+            restartButton.style.display = "block";
           }
         }
       }
@@ -221,6 +233,19 @@
       ctx.font = "28px sans-serif";
       ctx.fillText("Счёт: " + score, width / 2, height / 2 + 25);
       ctx.textAlign = "left";
+    }
+
+    function resetGame() {
+      score = 0;
+      lives = maxLives;
+      treats.length = 0;
+      isPaused = false;
+      isGameOver = false;
+      spitz.mood = "neutral";
+      pauseButton.style.display = "block";
+      pauseButton.innerText = "⏸ Пауза";
+      restartButton.style.display = "none";
+      update();
     }
 
     function update() {
@@ -262,16 +287,20 @@
 
     document.getElementById("startButton").addEventListener("click", () => {
       document.getElementById("startScreen").style.display = "none";
-      document.getElementById("pauseButton").style.display = "block";
+      pauseButton.style.display = "block";
       document.getElementById("bgMusic")?.play();
       update();
     });
 
-    document.getElementById("pauseButton").addEventListener("click", () => {
+    pauseButton.addEventListener("click", () => {
       if (isGameOver) return;
       isPaused = !isPaused;
-      document.getElementById("pauseButton").innerText = isPaused ? "▶ Продолжить" : "⏸ Пауза";
+      pauseButton.innerText = isPaused ? "▶ Продолжить" : "⏸ Пауза";
       if (!isPaused) update();
+    });
+
+    restartButton.addEventListener("click", () => {
+      resetGame();
     });
   </script>
 </body>
