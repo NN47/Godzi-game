@@ -7,7 +7,12 @@ from pathlib import Path
 from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (
+    Message,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    MenuButtonWebApp,
+)
 from aiogram.types.web_app_info import WebAppInfo
 
 logging.basicConfig(level=logging.INFO)
@@ -69,6 +74,13 @@ async def main() -> None:
     # Switch bot updates to polling mode.
     await bot.delete_webhook(drop_pending_updates=True)
     logger.info("Webhook removed, starting polling")
+    await bot.set_chat_menu_button(
+        menu_button=MenuButtonWebApp(
+            text="🎮 Godzi Game",
+            web_app=WebAppInfo(url=f"{APP_URL}/?v={APP_VERSION}"),
+        )
+    )
+    logger.info("Menu button updated with app version %s", APP_VERSION)
 
     await run_web_server()
     await dp.start_polling(bot)
