@@ -58,6 +58,8 @@ async def start(message: Message) -> None:
 
 
 async def index(request: web.Request) -> web.Response:
+    if request.rel_url.query.get("v") != APP_VERSION:
+        raise web.HTTPFound(f"/?v={APP_VERSION}")
     response = web.FileResponse(ROOT / "index.html")
     return response
 
@@ -74,6 +76,7 @@ def create_app() -> web.Application:
 
     # Healthcheck / home
     app.router.add_get("/", index)
+    app.router.add_get("/index.html", index)
 
     # Static files from repo root: /images, /music.mp3, etc.
     app.router.add_static("/", path=str(ROOT), show_index=False)
