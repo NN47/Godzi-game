@@ -13,6 +13,7 @@ from aiogram.types import (
     InlineKeyboardButton,
     ReplyKeyboardMarkup,
     KeyboardButton,
+    MenuButtonWebApp,
 )
 from aiogram.types.web_app_info import WebAppInfo
 
@@ -89,11 +90,23 @@ async def run_web_server() -> None:
     logger.info("Web server started on port %s", PORT)
 
 
+async def sync_menu_button() -> None:
+    web_app_url = f"{APP_URL}/?v={APP_VERSION}"
+    await bot.set_chat_menu_button(
+        menu_button=MenuButtonWebApp(
+            text="Открыть",
+            web_app=WebAppInfo(url=web_app_url),
+        )
+    )
+    logger.info("Chat menu button updated to %s", web_app_url)
+
+
 async def main() -> None:
     # Switch bot updates to polling mode.
     await bot.delete_webhook(drop_pending_updates=True)
     logger.info("Webhook removed, starting polling")
 
+    await sync_menu_button()
     await run_web_server()
     await dp.start_polling(bot)
 
