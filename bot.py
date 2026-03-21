@@ -31,6 +31,13 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def start(message: Message) -> None:
+    await bot.set_chat_menu_button(
+        chat_id=message.chat.id,
+        menu_button=MenuButtonWebApp(
+            text="🎮 Godzi Game",
+            web_app=WebAppInfo(url=f"{APP_URL}/?v={APP_VERSION}"),
+        ),
+    )
     kb = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(
@@ -44,13 +51,18 @@ async def start(message: Message) -> None:
 
 async def index(request: web.Request) -> web.Response:
     response = web.FileResponse(ROOT / "index.html")
+    return response
+
+
+async def disable_cache_headers(_request: web.Request, response: web.StreamResponse) -> None:
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
-    return response
+    response.headers["Expires"] = "0"
 
 
 def create_app() -> web.Application:
     app = web.Application()
+    app.on_response_prepare.append(disable_cache_headers)
 
     # Healthcheck / home
     app.router.add_get("/", index)
