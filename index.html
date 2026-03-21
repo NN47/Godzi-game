@@ -207,7 +207,7 @@
       const lifeIcon = "❤️";
       const lostLifeIcon = "🖤";
       const livesBar = lifeIcon.repeat(lives) + lostLifeIcon.repeat(maxLives - lives);
-      ctx.fillText("Жизни: " + livesBar, 20, 80);
+      ctx.fillText(livesBar, 20, 80);
     }
 
     function drawGameOver() {
