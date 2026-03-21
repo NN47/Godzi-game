@@ -11,6 +11,8 @@ from aiogram.types import (
     Message,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
 )
 from aiogram.types.web_app_info import WebAppInfo
 
@@ -30,14 +32,27 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def start(message: Message) -> None:
+    web_app_url = f"{APP_URL}/?v={APP_VERSION}"
+
     kb = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(
                 text="🎮 Открыть Godzi Game",
-                web_app=WebAppInfo(url=f"{APP_URL}/?v={APP_VERSION}"),
+                web_app=WebAppInfo(url=web_app_url),
             )
         ]]
     )
+    reply_kb = ReplyKeyboardMarkup(
+        keyboard=[[
+            KeyboardButton(
+                text="🎮 Открыть Godzi Game",
+                web_app=WebAppInfo(url=web_app_url),
+            )
+        ]],
+        resize_keyboard=True,
+    )
+
+    await message.answer("Обновил кнопку внизу: теперь она открывает актуальную версию игры 👇", reply_markup=reply_kb)
     await message.answer("Нажми кнопку ниже, чтобы открыть мини-приложение 👇", reply_markup=kb)
 
 
